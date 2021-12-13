@@ -51,7 +51,7 @@ void Delta::goTo(float x, float y, float z) {
   } else {
     //Serial.println("NOT IN WORKSPACE");
   }
-  reportPosition(); 
+  //reportPosition(); 
   //reportAngles();
 }
 
@@ -75,6 +75,13 @@ void Delta::reportPosition(){
   Serial.print(y0,2);
   Serial.print(" ");
   Serial.println(z0,2);
+}
+
+void Delta::reportPositionString(String start){
+  /* Report the curent position of the robot*/
+  //Serial.print("ATPOS ");
+  String printString = start + "\n" + String(x0, 2) + " " + String(y0, 2) + " " + String(z0,2);
+  Serial.println(printString);
 }
 
 void Delta::reportAngles(){

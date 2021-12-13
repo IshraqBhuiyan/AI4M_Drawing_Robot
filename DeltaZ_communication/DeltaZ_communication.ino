@@ -24,7 +24,7 @@ int xPin = A1;
 int yPin = A2;
 int switchpin = 3;
 volatile bool ycontrol = true;
-bool manual_mode = true;
+bool manual_mode = false;
 
 int joyMid =500;
 int joyThresh = 200;
@@ -41,9 +41,10 @@ void setup() {
   inputString.reserve(200);
   moveString.reserve(200);
   myDelta.setupMotors(9, 10, 11);
+  //myDelta.setupMotors(10,11, 9);
   myDelta.goHome();
   pinMode(switchpin, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(switchpin), switchInterr, RISING);
+  //attachInterrupt(digitalPinToInterrupt(switchpin), switchInterr, RISING);
   xVal =0;
   yVal = 0;
   zVal = -47;
@@ -122,14 +123,17 @@ void loop() {
       }else if(yVal<oldy){
         moveString+="-Y";
       }
-      Serial.println(moveString);
-      moveString="";
+      //Serial.println(moveString);
+      //moveString="";
       myDelta.goTo(xVal,yVal,zVal);
+      myDelta.reportPositionString(moveString);
+      moveString="";
     }
   }else if(moveString!=""){
     parseCommand();
-    Serial.println(moveString);
+    //Serial.println(moveString);
     myDelta.goTo(xVal,yVal,zVal);
+    myDelta.reportPositionString(moveString);
     moveString="";
   }
   delay(100);
@@ -143,17 +147,17 @@ void parseCommand(){
   while(copy!=""){
     String curr = copy.substring(0,2);
     copy = copy.substring(2);
-    if(copy.equalsIgnoreCase("+X")){
+    if(curr.equalsIgnoreCase("+X")){
       xVal+=1;
-    }else if(copy.equalsIgnoreCase("-X")){
+    }else if(curr.equalsIgnoreCase("-X")){
       xVal-=1;
-    }else if(copy.equalsIgnoreCase("+Z")){
+    }else if(curr.equalsIgnoreCase("+Z")){
       zVal+=1;
-    }else if(copy.equalsIgnoreCase("-Z")){
+    }else if(curr.equalsIgnoreCase("-Z")){
       zVal-=1;
-    }else if(copy.equalsIgnoreCase("+Y")){
+    }else if(curr.equalsIgnoreCase("+Y")){
       yVal+=1;
-    }else if(copy.equalsIgnoreCase("-Y")){
+    }else if(curr.equalsIgnoreCase("-Y")){
       yVal-=1;
     }
   }
