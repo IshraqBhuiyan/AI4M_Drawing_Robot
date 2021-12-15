@@ -51,8 +51,38 @@ mqttBroker = "192.168.2.1"
 
 client = mqtt.Client("Arduino")
 client.connect(mqttBroker, keepalive=300)
+client.subscribe([("goto",0), ("robostep", 0)])
 
 ser = serial.Serial('/dev/ttyUSB0')
+
+oldx = 0
+oldy = 0
+oldz = -47
+
+def on_message(client, userdata, message):
+    global ser, oldx, oldy, oldz, commandString
+    if(message.topic=='goto'):
+        desired = message.payload
+        desired = desired.split()
+        r_x = float(desired[0])
+        r_y = float(desired[1])
+        r_z = float(desired[2])
+        oldx = r_x
+        oldy = r_y
+        oldz = r_z
+        cmdString = "GOTO " + str(r_x) + "," + str(r_y) + "," + str(r_z) + "\n"
+        ser.write(bytes(cmdString.encode('ascii')))
+        print("Did GOTO ", cmdString)
+    elif(message.topic=='robostep'):
+        print("received command")
+        command = message.payload
+        command = command.decode()
+        if(commandString==""):
+            print("Received Command ", command)
+            commandString = command
+
+client.on_message = on_message
+client.loop_start()
 
 listener = keyboard.Listener(on_press=on_press)
 listener.start()
@@ -79,7 +109,14 @@ while(not done):
         r_z = float(robotpos_split[2])
         client.publish("robotpos", robotpos)
         print(r_x, r_y, r_z)
-        print(buffer[-3])
+        sendstr = buffer[-3].decode()
+        sendstr += " " + str(oldx) + " " + str(oldy) + " " + str(oldz)
+        sendstr += " " + str(r_x) + " " + str(r_y) + " " + str(r_z)
+        oldx = r_x
+        oldy = r_y
+        oldz = r_z
+        print(sendstr)
+        client.publish("robocomm", sendstr)
         commanded=False
 print("Done")
 ser.close()

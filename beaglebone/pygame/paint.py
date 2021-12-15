@@ -27,7 +27,7 @@ def on_message(client, userdata, message):
         l_y=  float(payload[1])
         l_x2 = float(payload[2])
         l_y2 = float(payload[3])
-        pygame.draw.line(screen, GREEN,(l_x, l_y), (l_x2, l_y2), width=15)
+        pygame.draw.line(screen, GREEN,(l_x-20, l_y), (l_x2, l_y2), width=41)
         pygame.display.flip()
     elif(message.topic=='save'):
         payload = message.payload
@@ -47,7 +47,7 @@ screen = pygame.display.set_mode((infoObject.current_w, infoObject.current_h))
 #screen = pygame.display.set_mode((800,480))
 
 def drawCircle(screen, x, y):
-    pygame.draw.circle(screen, BLUE, (x,y), 10)
+    pygame.draw.circle(screen, BLUE, (x,y), 20)
 isPressed=True
 
 #pygame.event.set_blocked(None)
@@ -79,7 +79,12 @@ while True:
                 oldx = x
                 oldy = y
                 drawCircle(screen, x, y)
+                publishString = str(x) + " " + str(y)
+                client.publish("fdraw", publishString)
+                print("fdraw string ", publishString)
         elif event.type== pygame.FINGERUP:
+            publishString = str(oldx) + " " + str(oldy)
+            client.publish("fup", publishString)
             print("fup")
        # if event.type == pygame.MOUSEBUTTONDOWN:
        #     isPressed = True
