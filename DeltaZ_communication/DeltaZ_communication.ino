@@ -70,6 +70,19 @@ void loop() {
     if((inputString.startsWith("+") || inputString.startsWith("-")) && (inputString.length() %2==0)){
       moveString=inputString;
     }
+    if (inputString.startsWith("GOTO")) { // parameterized messages
+      String posString = inputString.substring(5);
+      int commaIndex = posString.indexOf(',');
+      //  Search for the next comma just after the first
+      int secondCommaIndex = posString.indexOf(',', commaIndex + 1);
+      String firstValue = posString.substring(0, commaIndex);
+      String secondValue = posString.substring(commaIndex + 1, secondCommaIndex);
+      String thirdValue = posString.substring(secondCommaIndex + 1); // To the end of the string
+      float x = firstValue.toInt();
+      float y = secondValue.toInt();
+      float z = thirdValue.toInt();
+      myDelta.goTo(x, y, z);
+    }
     // clear the string:
     inputString = "";
     stringComplete = false;
